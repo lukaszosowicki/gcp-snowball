@@ -99,15 +99,17 @@ public class Application {
     String[] commands = new String[]{"F", "R", "L", "T"};
     PlayerState me = getMe(arenaUpdate);
     List<PlayerState> others = getOthers(arenaUpdate);
-    int i = new Random().nextInt(4);
-//    return commands[i];
-    return getStrategy(me, others);
+    if (me.wasHit) {
+      return commands[new Random().nextInt(3)];
+    } else {
+      return getStrategy(me, others);
+    }
   }
 
   private PlayerState getMe(ArenaUpdate arena) {
     return arena.arena.state.get(arena._links.self.href);
   }
-  
+
   private List<PlayerState> getOthers(ArenaUpdate arena) {
     return arena.arena.state.entrySet().stream().filter(e -> !e.getKey().equals(arena._links.self.href))
             .map(s -> s.getValue())
@@ -116,7 +118,7 @@ public class Application {
 
   private String getStrategy(PlayerState myState, List<PlayerState> otherStates) {
     List<PlayerState> playersInLine = getPlayersInLine(myState, otherStates);
-    
+
     if (playersInLine.stream().anyMatch(s -> calcDist(myState, s) <= 3)) {
       return "T";
     } else if (!playersInLine.isEmpty()) {
@@ -127,7 +129,7 @@ public class Application {
       return "L";
     }
   }
-  
+
   private int calcDist(PlayerState a, PlayerState b) {
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
   }
