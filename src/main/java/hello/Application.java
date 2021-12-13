@@ -100,19 +100,27 @@ public class Application {
     PlayerState me = getMe(arenaUpdate);
     List<PlayerState> others = getOthers(arenaUpdate);
     if (me.wasHit) {
-      return escape(me, others);
+      return escape(me, others, arenaUpdate.arena);
     } else {
       return getStrategy(me, others);
     }
   }
 
-  private String escape(PlayerState myState, List<PlayerState> otherStates){
+  private String escape(PlayerState myState, List<PlayerState> otherStates, Arena arena){
     PlayerState next = calculateNextMove(myState);
     if (otherStates.stream().anyMatch(s -> calcDist(next, s) == 0)) {
       return new Random().nextBoolean() ? "R" : "L";
     } else {
-      return "F";
+      if (nextMovePossible(next, arena)) {
+        return "F";
+      } else {
+        return new Random().nextBoolean() ? "R" : "L";
+      }
     }
+  }
+
+  private boolean nextMovePossible(PlayerState state, Arena arena) {
+    return state.x >= 0 && state.y >= 0 && state.x < arena.dims.get(0) && state.y < arena.dims.get(1);
   }
 
   private PlayerState calculateNextMove(PlayerState me) {
@@ -177,7 +185,7 @@ public class Application {
       }
     }
   }
-  
+
   private boolean thereArePlayersInDirectionAndRange(int range, PlayerState myState, List<PlayerState> others) {
     return !others.isEmpty() && others.stream().anyMatch(s -> calcDist(myState, s) <= range);
   }
@@ -185,7 +193,7 @@ public class Application {
   private int calcDist(PlayerState a, PlayerState b) {
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
   }
-  
+
   private String getLeftDir(String dir) {
     switch (dir) {
       case "N":
