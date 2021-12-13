@@ -153,21 +153,73 @@ public class Application {
 
     if (playersInLine.stream().anyMatch(s -> calcDist(myState, s) <= 3)) {
       return "T";
-    } else if (!playersInLine.isEmpty() && playersInLine.stream().anyMatch(s -> calcDist(s, myState) <= 6)) {
-      return "F";
-    } else if(new Random().nextInt(2) == 0) {
-      return "R";
     } else {
-      return "L";
+      String leftDir = getLeftDir(myState.direction);
+      String rightDir = getRightDir(myState.direction);
+      String oppositeDir = getRightDir(rightDir);
+      List<PlayerState> leftPlayers = getPlayersInLineForDir(myState, leftDir, otherStates);
+      List<PlayerState> rightPlayers = getPlayersInLineForDir(myState, rightDir, otherStates);
+      List<PlayerState> oppositePlayers = getPlayersInLineForDir(myState, oppositeDir, otherStates);
+      if (thereArePlayersInDirectionAndRange(3, myState, leftPlayers)) {
+        return "L";
+      } else if (thereArePlayersInDirectionAndRange(3, myState, rightPlayers)) {
+        return "R";
+      } else if (thereArePlayersInDirectionAndRange(3, myState, oppositePlayers)) {
+        return "R";
+      } else if (thereArePlayersInDirectionAndRange(6, myState, playersInLine)) {
+        return "F";
+      } else if (thereArePlayersInDirectionAndRange(6, myState, leftPlayers)) {
+        return "L";
+      } else if (thereArePlayersInDirectionAndRange(6, myState, rightPlayers)) {
+        return "R";
+      } else {
+        return new Random().nextBoolean() ? "L" : "R";
+      }
     }
+  }
+  
+  private boolean thereArePlayersInDirectionAndRange(int range, PlayerState myState, List<PlayerState> others) {
+    return !others.isEmpty() && others.stream().anyMatch(s -> calcDist(myState, s) <= range);
   }
 
   private int calcDist(PlayerState a, PlayerState b) {
     return Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
   }
+  
+  private String getLeftDir(String dir) {
+    switch (dir) {
+      case "N":
+        return "W";
+      case "S":
+        return "E";
+      case "E":
+        return "N";
+      case "W":
+        return "S";
+    }
+    return dir;
+  }
+
+  private String getRightDir(String dir) {
+    switch (dir) {
+      case "N":
+        return "E";
+      case "S":
+        return "W";
+      case "E":
+        return "S";
+      case "W":
+        return "N";
+    }
+    return dir;
+  }
 
   private List<PlayerState> getPlayersInLine(PlayerState myState, List<PlayerState> otherStates){
-    switch (myState.direction) {
+    return getPlayersInLineForDir(myState, myState.direction, otherStates);
+  }
+
+  private List<PlayerState> getPlayersInLineForDir(PlayerState myState, String dir, List<PlayerState> otherStates){
+    switch (dir) {
       case "N":
         return otherStates.stream().filter(s -> Objects.equals(myState.x, s.x) && myState.y - s.y > 0).collect(Collectors.toList());
       case "S":
