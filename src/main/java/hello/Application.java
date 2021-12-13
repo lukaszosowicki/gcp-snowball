@@ -186,14 +186,8 @@ public class Application {
         return "R";
       } else if (thereArePlayersInDirectionAndRange(3, myState, oppositePlayers)) {
         return "R";
-      } else if (thereArePlayersInDirectionAndRange(6, myState, playersInLine)) {
-        return "F";
-      } else if (thereArePlayersInDirectionAndRange(6, myState, leftPlayers)) {
-        return "L";
-      } else if (thereArePlayersInDirectionAndRange(6, myState, rightPlayers)) {
-        return "R";
       } else {
-        return new Random().nextBoolean() ? "L" : "R";
+        return "F";
       }
     }
   }
