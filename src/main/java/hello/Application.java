@@ -114,7 +114,7 @@ public class Application {
       return "F";
     }
   }
-  
+
   private PlayerState calculateNextMove(PlayerState me) {
     int x = me.x;
     int y = me.y;
@@ -137,7 +137,7 @@ public class Application {
     next.y = y;
     return next;
   }
-  
+
   private PlayerState getMe(ArenaUpdate arena) {
     return arena.arena.state.get(arena._links.self.href);
   }
@@ -153,7 +153,7 @@ public class Application {
 
     if (playersInLine.stream().anyMatch(s -> calcDist(myState, s) <= 3)) {
       return "T";
-    } else if (!playersInLine.isEmpty()) {
+    } else if (!playersInLine.isEmpty() && playersInLine.stream().anyMatch(s -> calcDist(s, myState) <= 6)) {
       return "F";
     } else if(new Random().nextInt(2) == 0) {
       return "R";
