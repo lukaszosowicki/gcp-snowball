@@ -100,12 +100,44 @@ public class Application {
     PlayerState me = getMe(arenaUpdate);
     List<PlayerState> others = getOthers(arenaUpdate);
     if (me.wasHit) {
-      return commands[new Random().nextInt(3)];
+      return escape(me, others);
     } else {
       return getStrategy(me, others);
     }
   }
 
+  private String escape(PlayerState myState, List<PlayerState> otherStates){
+    PlayerState next = calculateNextMove(myState);
+    if (otherStates.stream().anyMatch(s -> calcDist(next, s) == 0)) {
+      return new Random().nextBoolean() ? "R" : "L";
+    } else {
+      return "F";
+    }
+  }
+  
+  private PlayerState calculateNextMove(PlayerState me) {
+    int x = me.x;
+    int y = me.y;
+    switch(me.direction) {
+      case "N":
+        y -= 1;
+        break;
+      case "S":
+        y += 1;
+        break;
+      case "W":
+        x -= 1;
+        break;
+      case "E":
+        x += 1;
+        break;
+    }
+    PlayerState next = new PlayerState();
+    next.x = x;
+    next.y = y;
+    return next;
+  }
+  
   private PlayerState getMe(ArenaUpdate arena) {
     return arena.arena.state.get(arena._links.self.href);
   }
